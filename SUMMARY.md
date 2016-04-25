@@ -9,5 +9,5 @@
 * [实验6：Android数据库编程](lab6.md)
 * [实验7：Android网络编程](lab7.md)
 * [实验8：Android设备编程](lab8.md)
-* 实验9：Android综合实验
+* [实验9：Android综合实验](lab9.md)
 
