@@ -7,5 +7,5 @@
 * [实验4：Android界面设计](lab4.md)
 * [实验5：Android文件存储](lab5.md)
 * [实验6：Android数据库编程](lab6.md)
-* 实验7：Android网络编程
+* [实验7：Android网络编程](lab7.md)
 
