@@ -4,3 +4,7 @@
 
 ## 实验方案
 课时及实验内容设置。
+
+## 参与编写人员
+1. [@zengsn](https://github.com/zengsn)
+2. 
