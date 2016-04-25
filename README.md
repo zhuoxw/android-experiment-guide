@@ -6,5 +6,5 @@
 课时及实验内容设置。
 
 ## 参与编写人员
-1. [@zengsn](https://github.com/zengsn)
+1. [@zengsn](https://github.com/zengsn) （发起人，指导老师）
 2. 
