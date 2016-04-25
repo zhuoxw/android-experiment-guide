@@ -6,4 +6,5 @@
 * [实验3：Android资源使用](lab3.md)
 * [实验4：Android界面设计](lab4.md)
 * [实验5：Android文件存储](lab5.md)
+* 实验6：Android数据库编程
 
