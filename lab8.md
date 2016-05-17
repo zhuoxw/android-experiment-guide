@@ -32,7 +32,7 @@ if(!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)){
 <br>
 3设置查询条件
 ```
- String bestProvider = lm.getBestProvider(getCriteria(), true);
+        String bestProvider = lm.getBestProvider(getCriteria(), true);
         //获取位置信息
         //如果不设置查询要求，getLastKnownLocation方法传人的参数为LocationManager.GPS_PROVIDER
         Location location= lm.getLastKnownLocation(bestProvider);
@@ -56,9 +56,6 @@ if(!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)){
 ```
 private LocationListener locationListener=new LocationListener() {
 
-        /**
-         * 位置信息变化时触发
-         */
              public void onLocationChanged(Location location) {
             updateView(location);
 
