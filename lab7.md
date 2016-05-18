@@ -39,19 +39,15 @@
         try {
             s = new Socket("192.168.240.22", 9402);
             br = new BufferedReader((new InputStreamReader(s.getInputStream())));
-            os = s.getOutputStream();       //为什么br不是类似这样？
+            os = s.getOutputStream();       
             
             //do something
 
         }
-        catch (SocketTimeoutException e1)
+        catch (...)
         {
-            System.out.println("网络连接超时!!!");
+            //...
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+
     }
-}
 ```
