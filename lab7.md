@@ -33,7 +33,7 @@
 核心代码  
 服务器端：  
 
-(客户端代码：)[https://github.com/hzuapps/android-labs/blob/master/app/src/main/java/edu/hzuapps/androidworks/homeworks/net1314080903212/Net1314080903212ClientThread.java]
+[客户端代码：](https://github.com/hzuapps/android-labs/blob/master/app/src/main/java/edu/hzuapps/androidworks/homeworks/net1314080903212/Net1314080903212ClientThread.java)
 ```
     public void run()
     {
