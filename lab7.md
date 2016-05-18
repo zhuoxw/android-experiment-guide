@@ -32,7 +32,7 @@
 3). 真机调试的时候，真机和主机要在同一个局域网。  
 核心代码  
 服务器端：[(所有源码)](https://github.com/isshe/Android-20160303/tree/master/MultiChatServ)
-```
+``` java
 public class Myserver {
     //定义保存所有的Socket的ArrayList
     public static ArrayList<Socket> socketList = new ArrayList<Socket>();
@@ -52,7 +52,7 @@ public class Myserver {
 }  
 ```
 客户端代码：[(所有源码)](https://github.com/isshe/Android-20160303/tree/master/MultiChat/app/src/main/java/com/example/dell/multichat)
-```
+``` java
     public void run()
     {
         try {
