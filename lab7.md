@@ -28,7 +28,10 @@
 2). 读写socket。　　　　　　　　　　　　//1).中已经执行连接服务器的操作，所以接下来可以直接读写。  
 注意：    
 1). 客户端连接服务器的操作要放在新线程里面。  
-2). 需要添加权限：<uses-permission android:name="android.permission.INTERNET"/>  
+2). 需要添加权限：
+```
+    <uses-permission android:name="android.permission.INTERNET"/>  
+```
 3). 真机调试的时候，真机和主机要在同一个局域网。  
 核心代码  
 服务器端：[(所有源码)](https://github.com/isshe/Android-20160303/tree/master/MultiChatServ)
