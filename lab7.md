@@ -18,12 +18,12 @@
 　　在java中，服务器端socket、bind、listen等操作被封装在ServerSocket类库中，客户端socket、connect等操作被封装在Socket类库中。如需了解这些操作细节，可学习C语言下的socket编程。  
 详细步骤      
 服务器端步骤（单线程）    
-1). servs = new ServerSocket(port);　　　//port 为指定的端口号  
+1). servs = new ServerSocket(port);　　　//创建套接字，port 为指定的端口号  
 2). socket = servs.accept();　　　　　　　//等待连接，程序会阻塞在这里  
 3). 读写socket。  
 
 客户端步骤   
-1). socket = Socket("ip_str", port);　　//ip_str 为服务器端IP，port为端口号，和服务器端指定的要一样    
+1). socket = Socket("ip_str", port);　　//创建套接字，ip_str 为服务器端IP，port为端口号，和服务器端指定的要一样    
 2). 读写socket。　　　　　　　　　　　　//1).中已经执行连接服务器的操作，所以接下来可以直接读写。  
 注意：    
 1). 客户端连接服务器的操作要放在新线程里面。  
@@ -33,3 +33,27 @@
 服务器端：  
 
 客户端代码：
+...
+    public void run()
+    {
+        try {
+            System.out.println("Socket before!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            s = new Socket("192.168.240.22", 9402);
+            System.out.println("Socket behind!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            br = new BufferedReader((new InputStreamReader(s.getInputStream())));
+            os = s.getOutputStream();       //为什么br不是类似这样？
+            
+            //do something
+
+        }
+        catch (SocketTimeoutException e1)
+        {
+            System.out.println("网络连接超时!!!");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+}
+...
