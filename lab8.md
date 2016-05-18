@@ -15,6 +15,7 @@
 详细步骤<br>
 1修改AndroidManifest.xml，添加权限
 ```
+  <uses-permission Android:name="android.permission.INTERNET"/>
    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>  
    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />  
 ```
