@@ -31,14 +31,32 @@
 2). 需要添加权限：<uses-permission android:name="android.permission.INTERNET"/>  
 3). 真机调试的时候，真机和主机要在同一个局域网。  
 核心代码  
-服务器端：  
-
-[客户端代码：](https://github.com/hzuapps/android-labs/blob/master/app/src/main/java/edu/hzuapps/androidworks/homeworks/net1314080903212/Net1314080903212ClientThread.java)
+[服务器端：](https://github.com/isshe/Android-20160303/tree/master/MultiChatServ)
+```
+public class Myserver {
+    //定义保存所有的Socket的ArrayList
+    public static ArrayList<Socket> socketList = new ArrayList<Socket>();
+    
+    public static void main(String[] args) 
+        throws IOException
+    {
+        ServerSocket ss = new ServerSocket(9402);               //端口号为9402
+        while (true)
+        {
+            Socket s = ss.accept();
+            socketList.add(s);　　　　　　　　　　　//把新连接加入ArrayList中。
+            //每连接一个客户端就开一个线程为之服务
+            new Thread(new ServerThread(s)).start();
+        }   
+    }   
+}  
+```
+[客户端代码：](https://github.com/isshe/Android-20160303/tree/master/MultiChat/app/src/main/java/com/example/dell/multichat)
 ```
     public void run()
     {
         try {
-            s = new Socket("192.168.240.22", 9402);
+            s = new Socket("192.168.240.22", 9402);            //IP是服务器IP， 端口号和服务器一致
             br = new BufferedReader((new InputStreamReader(s.getInputStream())));
             os = s.getOutputStream();       
             
@@ -49,6 +67,5 @@
         {
             //...
         }
-
     }
 ```
