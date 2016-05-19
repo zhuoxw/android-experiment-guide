@@ -51,8 +51,8 @@ setOnSeekCompleteListener(OnSeekCompleteListener);//设置读取完整后的监�
 ```
 #####4.使用MediaPlayer完成设计
 ```
-MediaPlayer player = new MediaPlayer();
 
+	MediaPlayer player = new MediaPlayer();
     public Net1314080903219MediaPlayerService() {
 
       /*  try {
@@ -118,9 +118,9 @@ MediaPlayer player = new MediaPlayer();
         }
     }
 ```
-#####5.运行效果图
-
-
+#####5.完全源代码路径
+[github]
+(https://github.com/helloSingleDog/android-labs/tree/master/app/src/main/java/edu/hzuapps/androidworks/homeworks/net1314080903219)
 
 
 
