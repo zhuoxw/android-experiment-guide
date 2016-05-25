@@ -325,12 +325,73 @@ Net1314080903126OnePieceGame.java 来显示主界面的以及游戏规则和游�
 	
 
 ###4. 制作扫雷游戏界面
-简要说明……  
-详细步骤……  
-1. 
+简要说明：这里介绍的是扫雷游戏的初始界面和游戏进行界面的实现方法，它是通过获取每个格子的id值来调用显示相应的背景图片。
+详细步骤： 
+1. 先获取每个格子对象，再给每个格子对象编号或下标获取id值，代码如下：
 ```  
+public int getCount() {
+        return level*level;
+    }
+    /**
+     * 方法：获取每个格子对象
+     * @param position 格子编号，位置下标
+     * @return 格子类型的GameGroundEntity
+     * */
+    @Override
+    public GridEntity getItem(int position) {
+//        调用GameGroundEntity中的getEntity方法获取格子对象
+        return gameGround.getEntity(position);
+    }
+    /**
+     * 方法：通过适配器给每个格子对象编号或下标获取id值
+     * @return long类型，在java中，byte和short可自动转换为int，int可自动转换为long
+     * */
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
 
 ```  
+2.设置格子对象的背景图片， 不同状态下设置不同的背景图片（i00,i13等是图片的名字）
+``` 
+@param grid :格子对象
+     * */
+    public int getRes(GridEntity grid){
+//        设置格子对象的背景图片的ID为0
+        int resID=0;
+//        判断，如果格子对象被标记了且标记正确
+        if(grid.isFlag()&&!grid.isFlagWrong()){
+            resID=R.drawable.i_flag;
+        }
+//        判断，如果格子对象被标记了但标记不正确
+        else if(grid.isFlag()&&grid.isFlagWrong()){
+            resID=R.drawable.i14;
+        }
+//        判断，如果格子对象没有被点击，isShow()属性为false
+        else if(!grid.isShow()){
+            resID=R.drawable.i00;
+        }
+//        判断，格子对象是地雷且非自动显示
+        else if(grid.isBoom()&&!grid.isAutoShow()){
+            resID=R.drawable.i13;
+        }
+//        判断，格子对象是地雷，自动显示
+        else if(grid.isBoom()&&grid.isAutoShow()){
+            resID=R.drawable.i12;
+        }
+//        判断，格子周围没有地雷，是空白格
+        else if(grid.getBoomsCount()==0){
+            resID=R.drawable.i09;
+        }
+//        判断，格子中卫有地雷，个数为1-8个
+        else if(grid.getBoomsCount()!=0){
+//            动态拼接图片名，格式为图片名称，图片类型，资源所在包名
+            resID=context.getResources().getIdentifier("i0"+grid.getBoomsCount(),"drawable",context.getPackageName());
+        }
+        return resID;
+    }
+``` 
 源代码：!https://github.com/hzuapps/android-labs/tree/master/app/src/main/java/edu/hzuapps/androidworks/homeworks/com1314080901110
 
 
