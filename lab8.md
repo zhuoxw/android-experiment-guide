@@ -1110,4 +1110,8 @@ private final class SensorListener implements SensorEventListener {
 
 GitHub代码：https://github.com/hzuapps/android-labs/tree/master/app/src/main/java/edu/hzuapps/androidworks/homeworks/net1314080903146
 
+###7. 设置音量
 
+```  
+
+```  
