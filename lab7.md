@@ -75,7 +75,48 @@ public class Myserver {
 ```
 另一个例子：https://github.com/hzuapps/android-labs/tree/master/app/src/main/java/edu/hzuapps/androidworks/homeworks/net1314080903204/tcp_tester 
 
-###3. 从aqicn.org获取PM2.5信息
+###3. 从aqicn.org获取PM2.5信息@ZhengQZ123
 简要说明……  
+    利用aqicn.org提供的接口，显示pm2.5的数值
 详细步骤……  
-1. 
+1. 获取网络权限
+```
+    <uses-permission android:name="android.permission.INTERNET"/>  
+```
+2.读取http://aqicn.org/publishingdata/json提供的json数据
+``` 
+                     BufferedReader reader = new BufferedReader(new InputStreamReader(new
+                     URL("http://aqicn.org/publishingdata/json").openStream(), "utf-8"));
+                     String line=null;
+                     StringBuffer content =new StringBuffer();
+                     while((line=reader.readLine())!=null)
+                     {
+                        content.append(line);
+                     }
+ ```
+ 3.解析获取到的json数据
+ ``` 
+                    try {
+                        JSONArray jsonarr=new JSONArray(s);
+                        JSONObject firstJO=jsonarr.getJSONObject(0);
+                        JSONArray pollutants=firstJO.getJSONArray("pollutants");
+                        JSONObject firstPollutants=pollutants.getJSONObject(0);
+                        System.out.println("cityName=" firstJO.getString("cityName") ",local=" firstJO.getString("localName"));
+                        String cityName= firstJO.getString("cityName");
+                        String localName= firstJO.getString("localName");
+                        Double pollutant=firstPollutants.getDouble("value");
+                        String a=cityName+" "+localName+":"+pollutant;
+                        firstJO.getString("localName"),firstPollutants.getDouble("value"));
+                        tvPmData.setText(a);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+``` 
+4.将获取到的数据按照需要显示出来 tvPmData.setText(a)
+
+activity代码：(https://github.com/ZhengQZ123/android-labs/blob/master/app/src/main/java/edu/hzuapps/androidworks/homeworks/net1314080903247/Net1314080903247Activity.java)
+
+AndroidManifest代码：(https://github.com/ZhengQZ123/android-labs/blob/master/app/src/main/java/edu/hzuapps/androidworks/homeworks/net1314080903247/AndroidManifest.xml)
+
+activity xml代码：(https://github.com/ZhengQZ123/android-labs/blob/master/app/src/main/res/layout/activity_net1314080903247.xml)
+
