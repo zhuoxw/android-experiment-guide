@@ -332,3 +332,292 @@ Net1314080903126OnePieceGame.java 来显示主界面的以及游戏规则和游�
 
 ```  
 源代码：!https://github.com/hzuapps/android-labs/tree/master/app/src/main/java/edu/hzuapps/androidworks/homeworks/com1314080901110
+
+
+###5. 制作围住神经猫游戏界面 
+简要说明：简单版的围住神经猫游戏的背景是一排排的圆圈，可以用二维数组创建，而这些圆圈有三种状态，分别为猫可以走并可以设置路障的位置（灰色），猫所处的位置（红色），猫不能走并已开启路障的位置（橘色），这些状态定义在Dot类中，显然其应该有坐标X和Y；游戏的背景等我都放在Playground类中，背景是基于SurfaceView开发的，而里面还有很多功能，如猫和已设路障的初始化位置，猫如何躲路障，如何判断路可走，判断处在边界位置等等；最后在Activity中调用Playground。 
+
+详细步骤： 
+1. 建立Dot类，用来记录每个场景中的元素它的X,Y坐标点的状态。并不会直接参与界面的响应和界面的绘制。每一个点都是一个抽象的对象，需要把每一个点抽象为一个类，然后让每一个圆圈继承于这个类，或者直接把它实现为这个类的实例。每个点有三个状态：灰色-猫可走的路径；橘色-路障的状态
+无法改变；红色-猫当前的位置。
+
+```
+public class Net1314080903142Dot {
+	
+	int x,y;//当前点的X，Y坐标
+	int status;//记录这个点的状态
+	//三个表征圆点状态静态常量
+	public static final int STATUS_ON = 1;//已经开启路障的状态
+	public static final int STATUS_OFF = 0;//代表灰色可走路径
+	public static final int STATUS_IN = 9;//猫当前的位置
+    //三个数字不同即可，具体用哪个数字无所谓
+
+	
+       //指定X，Y坐标
+	public Net1314080903142Dot(int x, int y) {
+		super();
+		this.x = x;
+		this.y = y;
+		status = STATUS_OFF;
+	}
+
+       //指定geter和sette方法
+	public int getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+	//同时设置X，Y坐标的方法
+	public void setXY(int x,int y) {
+		this.y = y;
+		this.x = x;
+	}	
+}
+```
+
+2.建立Playground类，用来绘制界面还有实现游戏的各种算法。以下只详细介绍界面的绘制还有每个圆圈状态转化的过程。
+
+```
+public class Net1314080903142Playground  extends SurfaceView implements OnTouchListener{
+    //界面的响应和界面的绘制在SurfaceView完成，触摸事件的响应通过OnTouchListener接口实现
+		
+	
+	private static  int WIDTH = 40;
+	private static final int ROW = 10;//行高：每行储存10个元素
+	private static final int COL = 10;//列宽：每列储存10个元素
+	private static final int BLOCKS = 15;//默认添加的路障数量
+	
+	
+	private Dot Net1314080903142matrix[][];//声明二维数组来存放点元素
+	private Dot Net1314080903142cat;//声明猫这个点
+
+	public Net1314080903142Playground(Context context) {
+		super(context);//使用Context创建当前类构造函数
+		getHolder().addCallback(callback);//将Callback对象指定给getholder
+		matrix = new Net1314080903142Dot[ROW][COL];//将行高，列宽传递进去，指定数组大小
+		for (int i = 0; i < ROW; i++) {//循环添加数据
+			for (int j = 0; j < COL; j++) {
+				matrix[i][j] = new Net1314080903142Dot(j, i);/*X，Y坐标值和行列值是相反的。
+				即通过查找列值获得X坐标，查找行值获得Y坐标*/
+			}
+		}
+		setOnTouchListener(this);//设定为自己的触摸监听器
+		initGame();//调用游戏初始化
+	}
+
+
+	//坐标反转：封装一个getDot函数实现X，Y坐标反过来传递，所有的操作通过X，Y调用
+	private Net1314080903142Dot getDot(int x,int y) {
+		return matrix[y][x];
+	}
+
+
+       //实现猫移动到下一个点
+       private void MoveTo(Net1314080903142Dot one) {
+		one.setStatus(Net1314080903142Dot.STATUS_IN);//one的状态设置为猫所处的点
+		getDot(cat.getX(), cat.getY()).setStatus(Net1314080903142Dot.STATUS_OFF);;//将猫当前点的状态复位
+		cat.setXY(one.getX(), one.getY());//将猫移动到新的点
+	}
+	//猫的移动
+	private void move() {
+		if (isAtEdge(cat)) {
+			lose();return;/猫处于游戏边缘，失败
+		}
+		Vector<Net1314080903142Dot> avaliable = new Vector<Net1314080903142Dot>();//avaliable容器记录可用点
+		Vector<Net1314080903142Dot> positive = new Vector<Net1314080903142Dot>();//positive容器记录这个方向上可以直接到达屏幕边缘的路径
+		HashMap<Net1314080903142Dot, Integer> al = new HashMap<Net1314080903142Dot, Integer>();//al容器记录方向
+		for (int i = 1; i < 7; i++) {//如果当前猫被6个邻点围住
+			Net1314080903142Dot n = getNeighbour(cat, i);
+			if (n.getStatus() == Net1314080903142Dot.STATUS_OFF) {
+				avaliable.add(n);//如果相邻点可用，把它添加到avaliable记录器中
+				al.put(n, i);//为al传入方向i
+				if (getDistance(n, i) > 0) {
+					positive.add(n);//当它有一个路径可以直接到达屏幕边缘，把n传递进positive中
+					
+				}
+			}
+		}
+                //移动算法的优化
+		if (avaliable.size() == 0) {
+			win();//周围的6个点都不可走，没有可用点，成功围住猫
+		}else if (avaliable.size() == 1) {
+			MoveTo(avaliable.get(0));//只有一个方向可走，可用点有一个，移动到这个可用点上
+		}else{//有多个方向可走
+			Net1314080903142Dot best = null;
+			if (positive.size() != 0 ) {//存在可以直接到达屏幕边缘的走向
+				System.out.println("向前进");
+				int min = 999;//999远大于场景中的所有可用步长，其他数也可
+				for (int i = 0; i < positive.size(); i++) {
+					int a = getDistance(positive.get(i), al.get(positive.get(i)));
+					if (a < min) {
+						min = a;//把最短路径长度传给min
+						best = positive.get(i);//选出拥有最短路径的点
+					}
+				}
+				MoveTo(best);
+			}else {//所有方向都存在路障
+				System.out.println("躲路障");
+				int max = 0;
+				for (int i = 0; i < avaliable.size(); i++) {
+					int k = getDistance(avaliable.get(i), al.get(avaliable.get(i)));
+					if (k <= max) {//所有方向都存在路障，距离k为负数
+						max = k;
+						best = avaliable.get(i);//选出拥有最短路径的点
+					}
+				}
+				MoveTo(best);//移动到最短路径的下一点
+			}
+		}
+	}
+
+
+
+	//实现界面绘制，在redraw方法中将所有元素以图形化显示出来，也就是将它绘制在Canvas对象上
+        private void redraw() {
+		Canvas c = getHolder().lockCanvas();//锁定画布
+		c.drawColor(Color.LTGRAY);//设置颜色为浅灰色
+		Paint paint = new Paint();//创建Paint对象
+		paint.setFlags(Paint.ANTI_ALIAS_FLAG);//开启抗锯齿，优化视频质量
+		
+                //用两个For循环嵌套将所有的点显示到界面中来
+		for (int i = 0; i < ROW; i++) {
+			int offset = 0;//引入偏移量
+			if (i%2 != 0) {
+				offset = WIDTH/2;//对偶数行进行缩进
+			}
+			for (int j = 0; j < COL; j++) {
+				Net1314080903142Dot one = getDot(j, i);//将坐标赋值给内部变量one
+                                //由于每个点对应的三种状态颜色不一样，要用一个switch语句
+				switch (one.getStatus()) {
+				case Net1314080903142Dot.STATUS_OFF:
+					paint.setColor(0xFFEEEEEE);//STATUS_OFF状态时设置颜色为浅灰色
+					break;
+				case Net1314080903142Dot.STATUS_ON:
+					paint.setColor(0xFFFFAA00);//STATUS_ON状态时设置颜色为橘色
+					break;
+				case Net1314080903142Dot.STATUS_IN:
+					paint.setColor(0xFFFF0000);//STATUS_IN状态时设置颜色为红色
+					break;
+
+				default:
+					break;
+				}
+				c.drawOval(new RectF(one.getX()*WIDTH+offset, one.getY()*WIDTH, 
+						(one.getX()+1)*WIDTH+offset, (one.getY()+1)*WIDTH), paint);
+	                             /*在Canvas画布上画椭圆并界定它的上下左右边界宽度且有错位*/
+                           }
+			
+		}
+		getHolder().unlockCanvasAndPost(c);//取消Canvas的锁定，吧绘图内容更新到界面上
+	}
+
+	//为Surfaceview添加Callback
+	Callback callback = new Callback() {//声明并实例化一个Callback接口
+		
+		@Override
+		public void surfaceDestroyed(SurfaceHolder arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void surfaceCreated(SurfaceHolder arg0) {
+			// TODO Auto-generated method stub
+			redraw();//执行redraw函数，在界面第一次显示时将指定的内容显示到界面上
+		}
+		
+		@Override
+                 //使用surfaceChanged方法来适配不同的屏幕尺寸
+		public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
+                        
+                        //surfacechanged方法包含四个参数：SurfaceHolder holder，int format，int width，int height
+			// TODO Auto-generated method stub
+			WIDTH = arg2/(COL+1);//需要修改width，即arg2。
+			redraw();//重绘界面
+		}
+	};
+	//游戏初始化：分别对可走路径位置，猫的位置和路障位置进行初始化
+	private void initGame() {
+                //用for循环将所有点设置为STATUS_OFF，即可用状态
+		for (int i = 0; i < ROW; i++) {
+			for (int j = 0; j < COL; j++) {
+				matrix[i][j].setStatus(Net1314080903142Dot.STATUS_OFF);
+			}
+		}
+		cat = new Net1314080903142Dot(4, 5);//设置猫的起始点
+		getDot(4, 5).setStatus(Net1314080903142Dot.STATUS_IN);//把猫的起始点的状态设置为STATUS_IN，才能记录猫的位置
+
+                //用for循环随机的指定15个点的坐标作为路障
+		for (int i = 0; i < BLOCKS;) {
+			int x = (int) ((Math.random()*1000)%COL);
+			int y = (int) ((Math.random()*1000)%ROW);//随机获取1对坐标点
+			if (getDot(x, y).getStatus() == Net1314080903142Dot.STATUS_OFF) {//对当前可用路径点进行选择
+				getDot(x, y).setStatus(Net1314080903142Dot.STATUS_ON);//并把这个点设置为路障
+				i++;//循环内自加避免当前路障被重复添加
+				//System.out.println("Block:"+i);
+			}
+		}
+	}
+
+	@Override
+        //触摸事件的处理
+	public boolean onTouch(View arg0, MotionEvent e) {
+		if (e.getAction() == MotionEvent.ACTION_UP) {/当用户触摸之后手离开屏幕释放的瞬间才对事件进行响应
+             //	Toast.makeText(getContext(), e.getX()+":"+e.getY(), Toast.LENGTH_SHORT).show();
+                        //将屏幕的坐标转换为游戏的坐标
+			int x,y;
+			y = (int) (e.getY()/WIDTH);//横向状态下，奇、偶数行有坐标偏移，而纵向的Y值是不变的，将y进行转换
+			if (y%2 == 0) {
+				x = (int) (e.getX()/WIDTH);//奇数行直接将屏幕的X坐标转换成游戏的X坐标
+			}else {
+				x = (int) ((e.getX()-WIDTH/2)/WIDTH);//偶数行偏移半个元素宽度，故需减去WIDTH/2
+			}
+                         //数组越界异常时，对坐标进行保护
+			if (x+1 > COL || y+1 > ROW) {
+				initGame();//触摸超出边界时初始化游戏
+			}else if(getDot(x, y).getStatus() == Net1314080903142Dot.STATUS_OFF){
+				getDot(x, y).setStatus(Net1314080903142Dot.STATUS_ON);//当这个点可用时被点击之后设定为路障状态
+				move();
+			}
+			redraw();//将改变更新到界面
+		}
+		return true;
+	}
+}
+```
+
+3.最后创建Activity,调用Playground。
+
+```
+public class Net1314080903142Activity extends Activity {
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		setContentView(new Net1314080903142Playground(this));//Context把MainActivity的this传递进去
+	}
+
+}
+```
+
+备注：实现该游戏的其他算法未列出，有兴趣的可以在该网站看全部代码：https://github.com/hzuapps/android-labs/issues/139
