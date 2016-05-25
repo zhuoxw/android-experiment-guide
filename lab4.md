@@ -621,3 +621,7 @@ public class Net1314080903142Activity extends Activity {
 ```
 
 备注：实现该游戏的其他算法未列出，有兴趣的可以在该网站看全部代码：https://github.com/hzuapps/android-labs/issues/139
+
+###6. 自动滚动Banner图片
+
+
