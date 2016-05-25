@@ -141,6 +141,8 @@ GpsStatus.Listener listener = new GpsStatus.Listener() {
         }
     }
 ``` 
+###2. 移动定位模式选择
+####1. 
 
 ###2. 播放MP3音乐
 ####1.简要说明  
