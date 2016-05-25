@@ -1030,4 +1030,84 @@ mlocationClient.onDestroy();//销毁定位客户端。`
 
 看到这里，相信你对于如何运用高德SDK来实现自动定位也已经有了一定的了解了。因为代码整体上跟上一节的差不多，所有这里就不再重复演示代码了。只要做好这几步，便可以在页面上显示出自己当前所在的位置，这肯定也是难不倒你了吧。
 其实高德sdk的使用远远不止于这些方面，还有很多其他的功能等待你去发掘，比如可以在APP直观的用地图显示出你当前所在的位置等，这些东西在官方文档上面都有详细的介绍，感兴趣的你可以去研究一下，祝你早日完成自己想要的APP啦 (●'◡'●)
+```
+
+###5.实现指南针基本功能（磁场传感器调用）
+简要说明：这是一个简单的指南针应用，实现指南针基本的功能：基本的方向指定。旋转手机就能够在手机界面中看出方向的变换,这种操作在一个Activity中实现。
+详细步骤：
+
+####1.	第一步：获得传感器管理器
+
+```
+	//获得传感器管理器
+        manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+```
+
+####2.	第二步：为具体的传感器注册监听器 
+
+这里使用磁阻传感器方法Sensor.TYPE_ORIENTATION；
+SENSOR_TYPE_ORIENTATION这个传感器在android 2.2之后就不推荐使用了,在Android Studio中可以看到会有条横线横在代码中间,但是仍然能够使用，因此我还是使用这个方法：
+int TYPE_ORIENTATION 磁场传感器使用的常量
+
+```
+@Override
+    protected void onResume() {
+        //为具体的传感器注册监听器 ,这里使用磁阻传感器Sensor.TYPE_ORIENTATION.
+        Sensor sensor = manager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        //注册传感器监听事件
+        manager.registerListener(listener, sensor,
+                SensorManager.SENSOR_DELAY_GAME);   //SENSOR_DELAY_GAME(20,000毫秒延迟)
+        super.onResume();
+}
+```
+
+####3.	第三步：设置注销传感器监听事件
+
+```
+@Override
+    //注销传感器监听事件
+    protected void onPause() {
+        manager.unregisterListener(listener);
+        super.onPause();
+    }
+```
+
+不需要的传感器尽量要解除注册，特别是当activity处于失去焦点的状态时。如果不按照以上去做的话，手机电池很快会被用完。
+还要注意的是当屏幕关闭的时候，传感器也不会自动的解除注册。
+
+所以我们可以利用activity 中的 onPause() 方法和onresume()方法。
+在onresume方法中对传感器注册监听器，在onPause()方法中解除注册。
+
+####4.	第四步：实现具体的监听方法
+
+SensorEventListener接口中定义了两个方法：onSensorChanged和onAccuracyChanged。
+当传感器的值发生变化时，例如磁阻传感器的方向改变时会调用onSensorChanged方法。当传感器的精度变化时会调用onAccuracyChanged方法。
+
+onSensorChanged方法只有一个SensorEvent类型的参数event。其中SensorEvent类有一个values变量非常重要，该变量的类型是float[]。但该变量最多只有3个元素，而且根据传感器的不同，values变量中元素所代表的含义也不同。由于在这个Activity中仅仅是实现指南针的基本功能，只需要方向值的改变，因此值选用values[0]这个变量。
+
+values[0]：该值表示方位，也就是手机绕着Z轴旋转的角度。0表示北（North）；90表示东（East）；180表示南（South）；270表示西（West）。如果values[0]的值正好是这4个值，并且手机是水平放置，表示手机的正前方就是这4个方向。
+
+```
+private final class SensorListener implements SensorEventListener {
+     private float predegree = 0;
+     public void onSensorChanged(SensorEvent event) {
+         float degree = event.values[0];// 存放了方向值
+         RotateAnimation animation = new RotateAnimation(predegree, -degree,
+               Animation.RELATIVE_TO_SELF, 0.5f,
+               Animation.RELATIVE_TO_SELF, 0.5f);//控件以自身中心为圆心旋转
+         //设置动画执行的时间（单位：毫秒）;持续时间为0.2s
+         animation.setDuration(200);
+         //设置旋转的图片
+         imageView.startAnimation(animation);
+         predegree = -degree;
+     }
+     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+     }
+}
+```
+
+至此，有关于磁场传感器的方法调用就已经基本实现了。
+
+GitHub代码：https://github.com/hzuapps/android-labs/tree/master/app/src/main/java/edu/hzuapps/androidworks/homeworks/net1314080903146
+
 
