@@ -1115,3 +1115,7 @@ GitHub代码：https://github.com/hzuapps/android-labs/tree/master/app/src/main/
 ```  
 
 ```  
+
+###8. 获取短信
+
+
