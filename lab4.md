@@ -685,4 +685,447 @@ public class Net1314080903142Activity extends Activity {
 
 ###6. 自动滚动Banner图片
 
+####简要说明：
+本程序实现的是图片轮播banner，主要运用得到的控件为ViewPager,具体有以下功能：
+
+>a.定时功能，每隔5S切换下一张图片。
+
+>b.手动切换，可手势左右滑动选择上一张或下一张图片。
+>
+>c.跳转功能，点击跳转对应Activity
+
+####详细步骤
+
+1.指示器圆点，有两个状态，分别为选中和为选中。用两个shape实现。存放在drawable文件夹下
+
+
+- 未选中状态：net1314080903118_dot_normal.xml
+
+```xml
+
+	<?xml version="1.0" encoding="utf-8"?>
+	<shape xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:shape="oval" >
+	
+	    <solid android:color="#33000000" />
+	
+	    <corners android:radius="5dip" />
+	
+	</shape>
+```
+
+- 选中状态：net1314080903118_dot_press.xml
+
+```xml
+
+	<?xml version="1.0" encoding="utf-8"?>
+	<shape xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:shape="oval" >
+	
+	    <solid android:color="#aaFFFFFF" />
+	
+	    <corners android:radius="5dip" />
+	
+	</shape>
+```
+
+2.布局文件，主要用于显示图片的是ViewPager,九个View分别对应九个圆点，即可同时存放九张图片用于轮播。View的`background`使用上面定义的选中未选中状态。这里我单独抽取出来，使用时在主布局文件用 `include` 引入即可。
+
+- net1314080903118_banner.xml
+
+```xml
+
+	<?xml version="1.0" encoding="utf-8"?>
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical" >
+	
+	    <FrameLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="160dp" >
+	
+	        <android.support.v4.view.ViewPager
+	            android:id="@+id/vp"
+	            android:layout_width="match_parent"
+	            android:layout_height="160dp" />
+	
+	
+	        <LinearLayout
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_marginTop="10dip"
+	            android:layout_gravity="bottom|center_horizontal"
+	            android:layout_marginBottom="10dp"
+	            android:gravity="center" >
+	
+	            <View
+	                android:id="@+id/v_dot0"
+	                android:layout_width="5dip"
+	                android:layout_height="5dip"
+	                android:background="@drawable/net1314080903118_dot_press"
+	                android:layout_marginLeft="1.5dip"
+	                android:layout_marginRight="1.5dip"
+	                android:visibility="invisible" />
+	
+	            <View
+	                android:id="@+id/v_dot1"
+	                android:layout_width="5dip"
+	                android:layout_height="5dip"
+	                android:background="@drawable/net1314080903118_dot_normal"
+	                android:layout_marginLeft="1.5dip"
+	                android:layout_marginRight="1.5dip"
+	                android:visibility="invisible"/>
+	
+	            <View
+	                android:id="@+id/v_dot2"
+	                android:layout_width="5dip"
+	                android:layout_height="5dip"
+	                android:background="@drawable/net1314080903118_dot_normal"
+	                android:layout_marginLeft="1.5dip"
+	                android:layout_marginRight="1.5dip"
+	                android:visibility="invisible"/>
+	
+	            <View
+	                android:id="@+id/v_dot3"
+	                android:layout_width="5dip"
+	                android:layout_height="5dip"
+	                android:background="@drawable/net1314080903118_dot_normal"
+	                android:layout_marginLeft="1.5dip"
+	                android:layout_marginRight="1.5dip"
+	                android:visibility="invisible"/>
+	
+	            <View
+	                android:id="@+id/v_dot4"
+	                android:layout_width="5dip"
+	                android:layout_height="5dip"
+	                android:background="@drawable/net1314080903118_dot_normal"
+	                android:layout_marginLeft="1.5dip"
+	                android:layout_marginRight="1.5dip"
+	                android:visibility="invisible" />
+	            <View
+	                android:id="@+id/v_dot5"
+	                android:layout_width="5dip"
+	                android:layout_height="5dip"
+	                android:background="@drawable/net1314080903118_dot_normal"
+	                android:layout_marginLeft="1.5dip"
+	                android:layout_marginRight="1.5dip"
+	                android:visibility="invisible" />
+	            <View
+	                android:id="@+id/v_dot6"
+	                android:layout_width="5dip"
+	                android:layout_height="5dip"
+	                android:background="@drawable/net1314080903118_dot_normal"
+	                android:layout_marginLeft="1.5dip"
+	                android:layout_marginRight="1.5dip"
+	                android:visibility="invisible" />
+	            <View
+	                android:id="@+id/v_dot7"
+	                android:layout_width="5dip"
+	                android:layout_height="5dip"
+	                android:background="@drawable/net1314080903118_dot_normal"
+	                android:layout_marginLeft="1.5dip"
+	                android:layout_marginRight="1.5dip"
+	                android:visibility="invisible" />
+	            <View
+	                android:id="@+id/v_dot8"
+	                android:layout_width="5dip"
+	                android:layout_height="5dip"
+	                android:background="@drawable/net1314080903118_dot_normal"
+	                android:layout_marginLeft="1.5dip"
+	                android:layout_marginRight="1.5dip"
+	                android:visibility="invisible" />
+	        </LinearLayout>
+	    </FrameLayout>
+	
+	</LinearLayout>
+
+```
+
+3.关键代码
+>定时切换用到一个类：ScheduledExecutorService
+
+>作用是定时执行任务，我们这里要做的定时任务是，5秒执行一次图片切换
+
+```java
+
+	private void startAd() {
+	        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+	        // 当Activity显示出来后，每两秒切换一次图片显示
+	        scheduledExecutorService.scheduleAtFixedRate(new ScrollTask(), 1, 5,
+	                TimeUnit.SECONDS);
+	    }
+```
+
+>定义一个线程,滑动时通知handle响应,同时更改圆点索引号
+
+```java
+
+	private class ScrollTask implements Runnable {
+	
+	        @Override
+	        public void run() {
+	            synchronized (adViewPager) {
+	                currentItem = (currentItem + 1) % imageViews.size();
+	                handler.obtainMessage().sendToTarget();
+	            }
+	        }
+	    }
+```
+
+>通过handle来通知ViewPager进行视图切换
+
+```java
+
+	private Handler handler = new Handler() {
+	        public void handleMessage(android.os.Message msg) {
+	            adViewPager.setCurrentItem(currentItem);
+	        };
+	    };
+```
+
+>异步线程加载网络图片，具体代码我封装在`Net1314080903118MyRequest.java`中，详情可查看最后的链接。
+
+4.具体代码如下：
+
+```java
+	
+	public class BannerTestActivity extends AppCompatActivity {
+	
+	    private Context mContext;
+	    private ViewPager adViewPager;
+	    private List<ImageView> imageViews;// 滑动的图片集合
+	    private List<View> dots; // 图片标题正文的那些点
+	    private List<View> dotList;
+	
+	    private int currentItem = 0; // 当前图片的索引号
+	    // 定义的五个指示点
+	    private View dot0,dot1,dot2,dot3,dot4,dot5,dot6,dot7,dot8;
+	
+	    // 定时任务
+	    private ScheduledExecutorService scheduledExecutorService;
+	
+	    // 轮播banner的数据
+	    private List<String> mDataList = null;
+	
+	    private Handler handler = new Handler() {
+	        public void handleMessage(android.os.Message msg) {
+	            adViewPager.setCurrentItem(currentItem);
+	        };
+	    };
+	
+	    @Override
+	    protected void onCreate(@Nullable Bundle savedInstanceState) {
+	        super.onCreate(savedInstanceState);
+	        setContentView(R.layout.net1314080903118);
+	        setTitle("Net1314080903118");
+	        mContext = BannerTestActivity.this;
+	        initDatas();
+	        initView();
+	        startAd();
+	    }
+	
+	    /**
+	     * 添加九张图片的数据，用作模拟数据
+	     */
+	    private void initDatas() {
+	        mDataList = new ArrayList<>();
+	        mDataList.add("http://image.wufazhuce.com/Fi7nIAI3UFK4x42mwu4g18O3s8JO");
+	        mDataList.add("http://image.wufazhuce.com/Fn8JdRZ1g9IVbfSxrdAD6zYFVz3h");
+	        mDataList.add("http://image.wufazhuce.com/FjJPOSVbypiddiRbyHrws7AN6NlX");
+	        mDataList.add("http://image.wufazhuce.com/FiyEgeiSFJFLrOQxerXZOY-50LQr");
+	        mDataList.add("http://image.wufazhuce.com/Fg-EwcAuXvdd2ZvOQI8ym4EToRot");
+	        mDataList.add("http://image.wufazhuce.com/Fi7nIAI3UFK4x42mwu4g18O3s8JO");
+	        mDataList.add("http://image.wufazhuce.com/Fn8JdRZ1g9IVbfSxrdAD6zYFVz3h");
+	        mDataList.add("http://image.wufazhuce.com/FjJPOSVbypiddiRbyHrws7AN6NlX");
+	        mDataList.add("http://image.wufazhuce.com/FiyEgeiSFJFLrOQxerXZOY-50LQr");
+	        mDataList.add("http://image.wufazhuce.com/Fg-EwcAuXvdd2ZvOQI8ym4EToRot");
+	        mDataList.add("http://image.wufazhuce.com/Fi7nIAI3UFK4x42mwu4g18O3s8JO");
+	    }
+	
+	
+	    private void initView() {
+	        imageViews = new ArrayList<ImageView>();
+	        // 点
+	        dots = new ArrayList<View>();
+	        dotList = new ArrayList<View>();
+	        dot0 = findViewById(R.id.v_dot0);
+	        dot1 = findViewById(R.id.v_dot1);
+	        dot2 = findViewById(R.id.v_dot2);
+	        dot3 = findViewById(R.id.v_dot3);
+	        dot4 = findViewById(R.id.v_dot4);
+	        dot5 = findViewById(R.id.v_dot5);
+	        dot6 = findViewById(R.id.v_dot6);
+	        dot7 = findViewById(R.id.v_dot7);
+	        dot8 = findViewById(R.id.v_dot8);
+	        dots.add(dot0);
+	        dots.add(dot1);
+	        dots.add(dot2);
+	        dots.add(dot3);
+	        dots.add(dot4);
+	        dots.add(dot5);
+	        dots.add(dot6);
+	        dots.add(dot7);
+	        dots.add(dot8);
+	
+	        adViewPager = (ViewPager) findViewById(R.id.vp);
+	
+	        loadViewPager();
+	    }
+	
+	    private void addDynamicView() {
+	        // 动态添加图片和下面指示的圆点
+	        // 初始化图片资源
+	        for (int i = 0; i < mDataList.size(); i++) {
+	            ImageView imageView = new ImageView(mContext);
+	            new Net1314080903118MyRequest(mContext).getImage(mDataList.get(i),imageView);
+	            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+	            imageViews.add(imageView);
+	            dots.get(i).setVisibility(View.VISIBLE);
+	            dotList.add(dots.get(i));
+	        }
+	
+	    }
+	
+	
+	    /**
+	     * 定时任务，5s更换一次
+	     */
+	    private void startAd() {
+	        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+	        // 当Activity显示出来后，每两秒切换一次图片显示
+	        scheduledExecutorService.scheduleAtFixedRate(new ScrollTask(), 1, 5,
+	                TimeUnit.SECONDS);
+	    }
+	
+	
+	    /**
+	     * 自定义线程，滑动时通知handle响应
+	     */
+	    private class ScrollTask implements Runnable {
+	
+	        @Override
+	        public void run() {
+	            synchronized (adViewPager) {
+	                currentItem = (currentItem + 1) % imageViews.size();
+	                handler.obtainMessage().sendToTarget();
+	            }
+	        }
+	    }
+	
+	    @Override
+	    public void onStop() {
+	        super.onStop();
+	        // 当Activity不可见的时候停止切换
+	        scheduledExecutorService.shutdown();
+	    }
+	
+	    /**
+	     * 重写ViewPager，改变圆点是否选中状态
+	     * 在这里我们不需要重写ViewPager的滑动动作
+	     */
+	    private class MyPageChangeListener implements ViewPager.OnPageChangeListener {
+	
+	        private int oldPosition = 0;
+	
+	        @Override
+	        public void onPageScrollStateChanged(int arg0) {
+	
+	        }
+	
+	        @Override
+	        public void onPageScrolled(int arg0, float arg1, int arg2) {
+	
+	        }
+	
+	        @Override
+	        public void onPageSelected(int position) {
+	            currentItem = position;
+	            dots.get(oldPosition).setBackgroundResource(R.drawable.net1314080903118_dot_normal);
+	            dots.get(position).setBackgroundResource(R.drawable.net1314080903118_dot_press);
+	            oldPosition = position;
+	        }
+	    }
+	
+	    private void loadViewPager() {
+	        addDynamicView();
+	        // 设置填充ViewPager页面的适配器
+	        adViewPager.setAdapter(new Net1314080903118MyAdapter(mContext,mDataList, imageViews));
+	        // 设置一个监听器，当ViewPager中的页面改变时调用
+	        adViewPager.setOnPageChangeListener(new MyPageChangeListener());
+	    }
+	
+	    /**
+	     * 自定义ViewPager的适配器，具体点击图片的跳转逻辑在instantiateItem中实现
+	     */
+	    public class Net1314080903118MyAdapter extends PagerAdapter {
+	
+	        private List<String> DataList;
+	        private List<ImageView> imageList;
+	        private Context mContext;
+	
+	        public Net1314080903118MyAdapter(Context context,List<String> adList,List<ImageView> imageViews){
+	            this.DataList = adList;
+	            this.imageList = imageViews;
+	            this.mContext = context;
+	        }
+	
+	        @Override
+	        public int getCount() {
+	            return DataList.size();
+	        }
+	
+	        @Override
+	        public Object instantiateItem(ViewGroup container, int position) {
+	            ImageView iv = imageList.get(position);
+	            ((ViewPager) container).addView(iv);
+	            // 在这个方法里面设置图片的点击事件
+	            iv.setOnClickListener(new View.OnClickListener() {
+	
+	                @Override
+	                public void onClick(View v) {
+	                    // 处理跳转逻辑
+	                }
+	            });
+	            return iv;
+	        }
+	
+	        @Override
+	        public void destroyItem(View arg0, int arg1, Object arg2) {
+	            ((ViewPager) arg0).removeView((View) arg2);
+	        }
+	
+	        @Override
+	        public boolean isViewFromObject(View arg0, Object arg1) {
+	            return arg0 == arg1;
+	        }
+	
+	        @Override
+	        public void restoreState(Parcelable arg0, ClassLoader arg1) {
+	
+	        }
+	
+	        @Override
+	        public Parcelable saveState() {
+	            return null;
+	        }
+	
+	        @Override
+	        public void startUpdate(View arg0) {
+	
+	        }
+	
+	        @Override
+	        public void finishUpdate(View arg0) {
+	
+	        }
+	
+	    }
+	}
+
+```
+
+>备注：完整代码请访问以下链接
+
+[https://github.com/hzuapps/android-labs/issues/139](https://github.com/hzuapps/android-labs/issues/139 "https://github.com/hzuapps/android-labs/issues/139")
 
