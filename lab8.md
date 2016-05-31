@@ -1120,15 +1120,13 @@ GitHub代码：https://github.com/hzuapps/android-labs/tree/master/app/src/main/
 
 
 ###9. 相机
-1. 
 
-
-###10.手机震动（调用加速度传感器）
+###10. 手机震动（调用加速度传感器）
 简要说明：调用加速度传感器检测摇晃频率，摇晃频率达到速度阀值，手机震动。
-####步骤1.修改AndroidManifest.xml，添加控制手机震动及调用加速度传感器的权限
+####1. 修改AndroidManifest.xml，添加控制手机震动及调用加速度传感器的权限
  <uses-permission android:name="android.hardware.sensor.accelerometer" />
  <uses-permission android:name="android.permission.VIBRATE" />
-####步骤2.创建加速度传感器
+####2. 创建加速度传感器
  public void start(){
         //获得传感器管理器
         sensorManager=(SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
@@ -1168,7 +1166,7 @@ GitHub代码：https://github.com/hzuapps/android-labs/tree/master/app/src/main/
         //达到速度阀值，使手机震动        
         if(speed>=SPEED_SHRESHOLD)
     }
-####步骤3.震动
+####3. 震动
 public void StartVibrato(){
         //第一个参数是节奏数组
         mVibrator.vibrate(new long[] { 500,200,500,200 },-1);
