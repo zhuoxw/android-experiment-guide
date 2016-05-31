@@ -1121,6 +1121,10 @@ GitHub代码：https://github.com/hzuapps/android-labs/tree/master/app/src/main/
 
 ###9. 相机
 
+
+
+
+
 ###10. 手机震动（调用加速度传感器）
 简要说明：调用加速度传感器检测摇晃频率，摇晃频率达到速度阀值，手机震动。
 ####1. 修改AndroidManifest.xml，添加控制手机震动及调用加速度传感器的权限
