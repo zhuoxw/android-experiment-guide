@@ -1198,6 +1198,58 @@ GitHub代码：https://github.com/hzuapps/android-labs/tree/master/app/src/main/
 
 
 ###9. 相机
-1. 
 
 
+
+
+
+###10. 手机震动（调用加速度传感器）
+简要说明：调用加速度传感器检测摇晃频率，摇晃频率达到速度阀值，手机震动。
+####1. 修改AndroidManifest.xml，添加控制手机震动及调用加速度传感器的权限
+ <uses-permission android:name="android.hardware.sensor.accelerometer" />
+ <uses-permission android:name="android.permission.VIBRATE" />
+####2. 创建加速度传感器
+ public void start(){
+        //获得传感器管理器
+        sensorManager=(SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+        if(sensorManager!=null){
+            //获得加速度传感器
+            sensor=sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        //注册加速度传感器
+        if(sensor!=null){
+            sensorManager.registerListener(this,sensor,
+                    SensorManager.SENSOR_DELAY_GAME);
+        }
+    }
+    //加速度感应器感应获得变化数据
+    public void onSensorChanged(SensorEvent event){
+        //当前检查时间
+        long currentUpdateTime=System.currentTimeMillis();
+        //两次检测的时间间隔
+        long timeInterval=currentUpdateTime-lastUpdateTime;
+        //判断是否达到了检测时间间隔
+        if(timeInterval<UPTATE_INTERVAL_TIME)
+            return;
+        lastUpdateTime=currentUpdateTime;
+        //获得x,y,z坐标
+        float x=event.values[0];
+        float y=event.values[1];
+        float z=event.values[2];
+        //获得x,y,z的变化值
+        float deltaX=x-lastX;
+        float deltaY=y-lastY;
+        float deltaZ=z-lastZ;
+        //将现在的坐标变成last坐标
+        lastX=x;
+        lastY=y;
+        lastZ=z;
+        double speed=Math.sqrt(deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ)/
+                timeInterval*10000;
+        //达到速度阀值，使手机震动        
+        if(speed>=SPEED_SHRESHOLD)
+    }
+####3. 震动
+public void StartVibrato(){
+        //第一个参数是节奏数组
+        mVibrator.vibrate(new long[] { 500,200,500,200 },-1);
+    }
